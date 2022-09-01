@@ -5,9 +5,9 @@ services:
     init: true
     command: sleep infinity
     volumes:
-      - ${PWD}:/devcontainer:ro
-      - $HOME:/host_home:ro
-      - ${PWD}/..:/workspace:cached
+      - ${ShellkitWorkspace}/.devcontainer:/devcontainer:ro
+      - ${HOME}:/host_home:ro
+      - ${ShellkitWorkspace}:/workspace:cached
       - vdata:/vdata
 
 volumes:

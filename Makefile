@@ -14,14 +14,25 @@ shell_kits:=$(shell ls */version | xargs -n 1 dirname )
 # Some shellkit-meta items are independent of shellkit, but honor the setup protocol:
 all_subgits:=$(shell ls -d */.git | xargs -n 1 dirname )
 
-devcontainer_build_deps= \
+devcontainer_build_deps:= \
 	.devcontainer/bin/user-build.sh \
 	.devcontainer/Dockerfile \
 	.devcontainer/docker-compose.yaml \
 
 include environment.mk  # Symlink to environment-specific values, e.g. in user's ~/.shellkit-workspace-environment.mk
 
+DC:=docker-compose 
 
+.PHONY: print-environ
+print-environ:
+	@echo absdir=${absdir}
+	@echo ShellkitWorkspace=${ShellkitWorkspace}
+
+.devcontainer/.env: environment.mk
+	echo ShellkitWorkspace=${ShellkitWorkspace} > .devcontainer/.env
+
+.PHONY: dcenv
+dcenv: .devcontainer/.env
 
 # Maintain top-level project lists 'all_subgits' and 'shell_kits':
 .PHONY: all_subgits shell_kits
@@ -75,18 +86,18 @@ shellkit-test-base-exists:
 	@docker image ls | grep shellkit-test-base
 
 .PHONY: devcontainer-vscode-user
-devcontainer-vscode-user: shellkit-test-base-exists
+devcontainer-vscode-user: shellkit-test-base-exists dcenv
 	@ ( cd .devcontainer \
-		&& docker-compose run --rm shellkit-dev ls /home/vscode ) \
+		&&  $(DC)  run --rm shellkit-dev ls /home/vscode ) \
 		|| {  \
 			echo "No vscode user in shellkit-dev" ; \
 			make devcontainer-vscode-user-add ; \
 		}
 
-.devcontainer/build-semaphore: ${devcontainer_build_deps}
+.devcontainer/build-semaphore: ${devcontainer_build_deps} dcenv
 	@# Build the devcontainer
 	@cd .devcontainer \
-		&& docker-compose build
+		&& $(DC)  build
 	touch .devcontainer/build-semaphore
 
 
@@ -96,45 +107,65 @@ devcontainer-build: .devcontainer/build-semaphore
 
 
 .PHONY: devcontainer-run 
-devcontainer-run: .devcontainer/build-semaphore
+devcontainer-run: .devcontainer/build-semaphore dcenv
 	@# For testing inside the raw container (temp)
 	@cd .devcontainer && \
-		docker-compose run --rm shellkit-dev bash
+		$(DC)  run --rm shellkit-dev bash
 
-.PHONY: devcontainer-config 
-devcontainer-config:
+.PHONY: devcontainer-config  
+devcontainer-config: dcenv
 	@cd .devcontainer && \
-		docker-compose config
+		$(DC) config
 
 .PHONY: devcontainer-ps 
-devcontainer-ps:
+devcontainer-ps: dcenv
 	@cd .devcontainer && \
-		docker-compose ps
+		$(DC)  ps
 
 .PHONY: devcontainer-up
-devcontainer-up: .devcontainer/build-semaphore
+devcontainer-up: .devcontainer/build-semaphore dcenv
 	@# devcontainer-up ensures the container is up or starts it if not
 	@cd .devcontainer \
-		&& docker-compose ps shellkit-dev | grep ' Up ' \
+		&& $(DC) ps shellkit-dev | grep ' Up ' \
 		|| { \
-		  docker-compose up -d shellkit-dev; \
+		  $(DC)  up -d shellkit-dev; \
 		  sleep 3; \
-		  docker-compose exec shellkit-dev true ; \
+		  $(DC)  exec shellkit-dev true ; \
 		}
 
 .PHONY: devcontainer-exec
-devcontainer-exec: devcontainer-up
+devcontainer-exec: devcontainer-up dcenv
 	@# For testing inside the running container
 	@cd .devcontainer && \
-		docker-compose exec shellkit-dev bash 
+		 $(DC) exec shellkit-dev bash 
 
 .PHONY: devcontainer-down
-devcontainer-down:
+devcontainer-down: dcenv
 	@# Bring the devcontainer down if its running
 	@cd .devcontainer \
 		&& { \
-			docker-compose ps shellkit-dev | grep ' Up ' \
-			&& docker-compose down  ; \
+			$(DC)  ps shellkit-dev | grep ' Up ' \
+			&& $(DC)  down  ; \
 		} || true
+
+.PHONY: devcontainer-bin-installed
+devcontainer-bin-installed: 
+	@# Check to see if the Microsoft 'devcontainer' tool is installed
+	which  devcontainer >/dev/null \
+		|| { \
+			echo "ERROR: install devcontainer tool first" >&2; \
+			exit 1; \
+		}
+
+.PHONY: code-devcontainer-build
+code-devcontainer-build: shellkit-test-base-exists devcontainer-bin-installed dcenv
+	@# Launch vscode using the devcontainer --open command
+	devcontainer build 
+
+.PHONY: code-devcontainer-open
+code-devcontainer-open: code-devcontainer-build dcenv
+	@# Launch vscode using the devcontainer --open command
+	devcontainer open
+
 
 
