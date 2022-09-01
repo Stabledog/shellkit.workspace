@@ -11,6 +11,8 @@ shell_kits:=$(shell ls */version | xargs -n 1 dirname )
 # Some shellkit-meta items are independent of shellkit, but honor the setup protocol:
 all_subgits:=$(shell ls -d */.git | xargs -n 1 dirname )
 
+include environment.mk  # Symlink to environment-specific values
+
 # Maintain top-level project lists 'all_subgits' and 'shell_kits':
 all_subgits shell_kits: ${all_subgits} Makefile
 	@echo all_subgits=${all_subgits} | tee all_subgits
@@ -28,4 +30,4 @@ git-push:
 	  do ( echo '$$\n' "[$${item}]" ; cd $${item} && git push ; git status; echo "[End of: $$item]")  ;  done
 	git push
 
-
+git-sync: git-pull git-push
