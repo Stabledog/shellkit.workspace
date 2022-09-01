@@ -9,10 +9,10 @@ none:
 absdir:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 # These are dependent on shellkit:
-shell_kits:=$(shell ls */version | xargs -n 1 dirname )
+shell_kits:=$(shell ls */version 2>/dev/null | xargs -n 1 dirname )
 
 # Some shellkit-meta items are independent of shellkit, but honor the setup protocol:
-all_subgits:=$(shell ls -d */.git | xargs -n 1 dirname )
+all_subgits:=$(shell ls -d */.git 2>/dev/null | xargs -n 1 dirname )
 
 devcontainer_build_deps:= \
 	.devcontainer/bin/user-build.sh \
@@ -21,7 +21,7 @@ devcontainer_build_deps:= \
 
 include environment.mk  # Symlink to environment-specific values, e.g. in user's ~/.shellkit-workspace-environment.mk
 
-DC:=docker-compose 
+DC:=docker-compose
 
 .PHONY: print-environ
 print-environ:
@@ -73,12 +73,17 @@ ${absdir}/all-push-remotes git-show-push-remotes:
 			  ; \
 	done
 
+environment.mk:
+	@echo ERROR: You need to create a symlink named .environment.mk which defines
+	@echo basic information
+	exit 1
+
 .PHONY: setup-workspace
-setup-workspace:
-	@# workspace_members is set in environment.mk:
-	@for item in ${workspace_members};  do \
-		[ -d $${item} ] && { echo Done: $$item already exists ; continue ; }; \
-	    git clone $$item ; \
+setup-workspace: environment.mk
+	@# setup_clone_urls is set in environment.mk:
+	@for item in ${setup_clone_urls};  do \
+		[ -d $$(basename $${item}) ] && { echo Done: $$item already exists ; continue ; }; \
+	    git clone $$item || exit 1; \
 	done
 
 .PHONY: shellkit-test-base-exists
@@ -106,18 +111,18 @@ devcontainer-vscode-user: shellkit-test-base-exists dcenv
 devcontainer-build: .devcontainer/build-semaphore
 
 
-.PHONY: devcontainer-run 
+.PHONY: devcontainer-run
 devcontainer-run: .devcontainer/build-semaphore dcenv
 	@# For testing inside the raw container (temp)
 	@cd .devcontainer && \
 		$(DC)  run --rm shellkit-dev bash
 
-.PHONY: devcontainer-config  
+.PHONY: devcontainer-config
 devcontainer-config: dcenv
 	@cd .devcontainer && \
 		$(DC) config
 
-.PHONY: devcontainer-ps 
+.PHONY: devcontainer-ps
 devcontainer-ps: dcenv
 	@cd .devcontainer && \
 		$(DC)  ps
@@ -137,7 +142,7 @@ devcontainer-up: .devcontainer/build-semaphore dcenv
 devcontainer-exec: devcontainer-up dcenv
 	@# For testing inside the running container
 	@cd .devcontainer && \
-		 $(DC) exec shellkit-dev bash 
+		 $(DC) exec shellkit-dev bash
 
 .PHONY: devcontainer-down
 devcontainer-down: dcenv
@@ -149,7 +154,7 @@ devcontainer-down: dcenv
 		} || true
 
 .PHONY: devcontainer-bin-installed
-devcontainer-bin-installed: 
+devcontainer-bin-installed:
 	@# Check to see if the Microsoft 'devcontainer' tool is installed
 	which  devcontainer >/dev/null \
 		|| { \
@@ -160,7 +165,7 @@ devcontainer-bin-installed:
 .PHONY: code-devcontainer-build
 code-devcontainer-build: shellkit-test-base-exists devcontainer-bin-installed dcenv
 	@# Launch vscode using the devcontainer --open command
-	devcontainer build 
+	devcontainer build
 
 .PHONY: code-devcontainer-open
 code-devcontainer-open: code-devcontainer-build dcenv
