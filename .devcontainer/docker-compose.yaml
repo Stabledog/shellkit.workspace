@@ -1,0 +1,10 @@
+version: "3.4"
+services:
+  shellkit-dev:
+    image: shellkit-test-base
+    init: true
+    command: sleep infinity
+    volumes:
+      - $PWD:/devcontainer:ro
+      - $HOME:/host_home:ro
+      - $PWD/..:/workspace:cached
