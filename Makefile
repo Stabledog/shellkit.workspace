@@ -47,14 +47,18 @@ all_subgits shell_kits: ${all_subgits} Makefile
 
 .PHONY: git-status
 git-status:
+	@echo "git status -s for all_subgits:" >&2; \
 	for item in ${all_subgits};  do \
 	( \
 		cd $$item || exit 1 ;\
 		echo "$$item:" ;\
-		git status | sed -e 's/^/   /' ;\
+		git status -s | sed -e 's/^/   /' ;\
 		echo; \
 	) || exit 1; \
 	done; \
+	echo "git status -s for $$PWD:" >&2; \
+	git status -s | sed -e 's/^/   /' ;\
+
 
 .PHONY: git-pull
 git-pull:
