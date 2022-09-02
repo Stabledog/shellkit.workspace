@@ -11,3 +11,4 @@ taskrc
 taskrc-kit
 environment.mk
 *proxy-env
+*shellkit
