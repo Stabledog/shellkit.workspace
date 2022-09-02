@@ -1,9 +1,5 @@
 # Makefile for shellkit.workspace
 
-.PHONY: none
-none:
-	@echo Error --  no default target
-	exit 1
 
 # See https://stackoverflow.com/a/73509979/237059
 absdir:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -19,14 +15,23 @@ devcontainer_build_deps:= \
 	.devcontainer/Dockerfile \
 	.devcontainer/docker-compose.yaml \
 
+.PHONY: none
+none: print-environ
+	@echo Error --  no default target
+	exit 1
+
 include environment.mk  # Symlink to environment-specific values, e.g. in user's ~/.shellkit-workspace-environment.mk
 
 DC:=docker-compose
 
+
 .PHONY: print-environ
 print-environ:
-	@echo absdir=${absdir}
-	@echo ShellkitWorkspace=${ShellkitWorkspace}
+	@echo absdir=${absdir} "\n"\
+	ShellkitWorkspace=${ShellkitWorkspace} "\n"\
+	shell_kits=${shell_kits} "\n"\
+	all_subgits=${all_subgits} "\n"\
+	devcontainer_build_deps=${devcontainer_build_deps} "\n"\
 
 .devcontainer/.env: environment.mk
 	echo ShellkitWorkspace=${ShellkitWorkspace} > .devcontainer/.env
@@ -39,6 +44,17 @@ dcenv: .devcontainer/.env
 all_subgits shell_kits: ${all_subgits} Makefile
 	@echo all_subgits=${all_subgits} | tee all_subgits
 	@echo shell_kits=${shell_kits} | tee shell_kits
+
+.PHONY: git-status
+git-status:
+	for item in ${all_subgits};  do \
+	( \
+		cd $$item || exit 1 ;\
+		echo "$$item:" ;\
+		git status | sed -e 's/^/   /' ;\
+		echo; \
+	) || exit 1; \
+	done; \
 
 .PHONY: git-pull
 git-pull:
