@@ -45,8 +45,8 @@ all_subgits shell_kits: ${all_subgits} Makefile
 	@echo all_subgits=${all_subgits} | tee all_subgits
 	@echo shell_kits=${shell_kits} | tee shell_kits
 
-.PHONY: git-status
-git-status:
+.PHONY: git-status gs
+git-status gs:
 	@echo "git status -s for all_subgits:" >&2; \
 	for item in ${all_subgits};  do \
 	( \
