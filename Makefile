@@ -20,7 +20,7 @@ none: print-environ
 	@echo Error --  no default target
 	exit 1
 
-include environment.mk  # Symlink to environment-specific values, e.g. in user's ~/.shellkit-workspace-environment.mk
+include environment.mk  # Symlink to environment-specific values
 
 DC:=docker-compose
 
