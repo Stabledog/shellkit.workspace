@@ -11,3 +11,4 @@ taskrc-kit
 environment.mk
 *proxy-env
 *shellkit
+bcs-foo
