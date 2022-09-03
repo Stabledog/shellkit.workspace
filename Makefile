@@ -1,37 +1,45 @@
 # Makefile for shellkit.workspace
 
 
+.PHONY: none
+none: print-environ
+	@echo "Error --  no default target.  If you're just getting started with \
+shellkit.workspace, or setting up a new dev environment, try the \"setup-workspace\" target."
+
+	exit 1
+
 # See https://stackoverflow.com/a/73509979/237059
 absdir:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-# These are dependent on shellkit:
-shell_kits:=$(shell ls */version 2>/dev/null | xargs -n 1 dirname )
+shellkit_codebase:=https://github.com/sanekits/shellkit.git
 
 # Some shellkit-meta items are independent of shellkit, but honor the setup protocol:
-all_subgits:=$(shell ls -d */.git 2>/dev/null | xargs -n 1 dirname )
+all_subgits:=$(shell ls -d */.git 2>/dev/null | xargs -n 1 dirname -- 2>/dev/null)
 
 devcontainer_build_deps:= \
 	.devcontainer/bin/user-build.sh \
 	.devcontainer/Dockerfile \
 	.devcontainer/docker-compose.yaml \
 
-.PHONY: none
-none: print-environ
-	@echo Error --  no default target
-	exit 1
 
 include environment.mk  # Symlink to environment-specific values
 
 DC:=docker-compose
 
 
+.PHONY: list-targets
+list-targets:
+	@LC_ALL=C $(MAKE) -pRrq -f Makefile : 2>/dev/null | awk -v RS= -F: '/(^|\n)# Files(\n|$$)/,/(^|\n)# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | tr '\n' ' '
+
 .PHONY: print-environ
-print-environ:
+print-environ: all_subgits environment.mk
 	@echo absdir=${absdir} "\n"\
 	ShellkitWorkspace=${ShellkitWorkspace} "\n"\
-	shell_kits=${shell_kits} "\n"\
+	shellkit_codebase=${shellkit_codebase} "\n"\
 	all_subgits=${all_subgits} "\n"\
+	workspace_packages=${workspace_packages} "\n"\
 	devcontainer_build_deps=${devcontainer_build_deps} "\n"\
+	all_targets=$$( $(MAKE) -s list-targets ) "\n"\
 
 .devcontainer/.env: environment.mk
 	echo ShellkitWorkspace=${ShellkitWorkspace} > .devcontainer/.env
@@ -39,11 +47,10 @@ print-environ:
 .PHONY: dcenv
 dcenv: .devcontainer/.env
 
-# Maintain top-level project lists 'all_subgits' and 'shell_kits':
-.PHONY: all_subgits shell_kits
-all_subgits shell_kits: ${all_subgits} Makefile
-	@echo all_subgits=${all_subgits} | tee all_subgits
-	@echo shell_kits=${shell_kits} | tee shell_kits
+# Maintain top-level git project list 'all_subgits':
+.PHONY: all_subgits
+all_subgits: Makefile
+	@echo ${all_subgits} > all_subgits
 
 .PHONY: git-status gs
 git-status gs:
@@ -93,18 +100,34 @@ ${absdir}/all-push-remotes git-show-push-remotes:
 			  ; \
 	done
 
-environment.mk:
-	@echo ERROR: You need to create a symlink named .environment.mk which defines
-	@echo basic information
+${HOME}/.shellkit-environment.mk:
+	@cp templates/default-environment.mk ~/.shellkit-environment.mk
+	@echo "NOTE:  you did not have a ~/.shellkit-environment.mk, so \
+I created one for you.  Now it's yours, and it's up to you to \
+put it in source control and customize it and take the blame \
+for whatever's in it!"
+	@echo "  (You should run make again after you've done that)"
+	@ln -sf ${HOME}/.shellkit-environment.mk ./environment.mk
+	@echo
+	@echo "Fail-exit on purpose to get the user's attention:"
 	exit 1
+
+environment.mk: ${HOME}/.shellkit-environment.mk
 
 .PHONY: setup-workspace
 setup-workspace: environment.mk
 	@# setup_clone_urls is set in environment.mk:
 	@for item in ${setup_clone_urls};  do \
-		[ -d $$(basename $${item}) ] && { echo Done: $$item already exists ; continue ; }; \
-	    git clone $$item || exit 1; \
-	done
+		[ -d $$(basename $${item}) ] || { \
+	    	git clone $$item ; \
+		};  \
+	 	(  \
+			cd $$(basename -- $$item) && [ -e ./make-kit.mk ] && { \
+			   [ -d ./shellkit ] || git clone ${shellkit_codebase} ./shellkit ;  \
+			} \
+		); \
+	done; \
+	true;
 
 .PHONY: shellkit-test-base-exists
 shellkit-test-base-exists:

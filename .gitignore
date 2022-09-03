@@ -12,3 +12,5 @@ environment.mk
 *proxy-env
 *shellkit
 bcs-foo
+all_subgits
+vscode-tools
