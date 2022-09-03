@@ -48,8 +48,9 @@ print-environ: all_subgits environment.mk
 dcenv: .devcontainer/.env
 
 # Maintain top-level git project list 'all_subgits':
+.PHONY: all_subgits
 all_subgits: Makefile
-	@echo all_subgits=${all_subgits} | tee all_subgits
+	@echo ${all_subgits} > all_subgits
 
 .PHONY: git-status gs
 git-status gs:
