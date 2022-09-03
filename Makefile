@@ -27,6 +27,10 @@ include environment.mk  # Symlink to environment-specific values
 DC:=docker-compose
 
 
+.PHONY: list-targets
+list-targets:
+	@LC_ALL=C $(MAKE) -pRrq -f Makefile : 2>/dev/null | awk -v RS= -F: '/(^|\n)# Files(\n|$$)/,/(^|\n)# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | tr '\n' ' '
+
 .PHONY: print-environ
 print-environ: all_subgits environment.mk
 	@echo absdir=${absdir} "\n"\
