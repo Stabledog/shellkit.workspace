@@ -11,6 +11,7 @@ shellkit.workspace, or setting up a new dev environment, try the \"setup-workspa
 # See https://stackoverflow.com/a/73509979/237059
 absdir:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
+shellkit_codebase:=https://github.com/sanekits/shellkit.git
 
 # Some shellkit-meta items are independent of shellkit, but honor the setup protocol:
 all_subgits:=$(shell ls -d */.git 2>/dev/null | xargs -n 1 dirname -- 2>/dev/null)
@@ -30,6 +31,7 @@ DC:=docker-compose
 print-environ: all_subgits environment.mk
 	@echo absdir=${absdir} "\n"\
 	ShellkitWorkspace=${ShellkitWorkspace} "\n"\
+	shellkit_codebase=${shellkit_codebase} "\n"\
 	all_subgits=${all_subgits} "\n"\
 	workspace_packages=${workspace_packages} "\n"\
 	devcontainer_build_deps=${devcontainer_build_deps} "\n"\
@@ -110,9 +112,14 @@ environment.mk: ${HOME}/.shellkit-environment.mk
 setup-workspace: environment.mk
 	@# setup_clone_urls is set in environment.mk:
 	@for item in ${setup_clone_urls};  do \
-		[ -d $$(basename $${item}) ] && { echo Done: $$item already exists ; continue ; }; \
-	    git clone $$item || exit 1; \
-	done
+		[ -d $$(basename $${item}) ] || { \
+	    	git clone $$item ; \
+		};  \
+	 	cd $$(basename -- $$item) && [ -e ./make-kit.mk ] && { \
+			   [ -d ./shellkit ] || git clone ${shellkit_codebase} ./shellkit ;  \
+			}; \
+	done; \
+	true;
 
 .PHONY: shellkit-test-base-exists
 shellkit-test-base-exists:
