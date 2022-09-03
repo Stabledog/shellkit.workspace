@@ -8,8 +8,18 @@
 #  Then you should have a symlink from that controlled file to ./environment.mk
 
 
-# workspace_packages is the set of user-installable packages being maintained in this workspace.  You can capture initial data for "workspace_members" by running "make print-subgits" in an existing workspace and removing anything that's not a publishable package.
-workspace_packages:=cdpp docktools gh-help gitsmart localhist ps1-foo bcs-test shellkit-meta shellkit-pm taskrc-kit
+# workspace_packages is the set of user-installable packages being maintained in this workspace.
+workspace_packages:=\
+cdpp\
+docktools\
+gh-help\
+gitsmart\
+localhist\
+ps1-foo\
+shellkit-meta\
+shellkit-pm\
+taskrc-kit\
+
 
 setup_clone_urls:= \
 	https://github.com/sanekits/cdpp \
