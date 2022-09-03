@@ -39,6 +39,7 @@ print-environ: all_subgits environment.mk
 	all_subgits=${all_subgits} "\n"\
 	workspace_packages=${workspace_packages} "\n"\
 	devcontainer_build_deps=${devcontainer_build_deps} "\n"\
+	all_targets=$$( $(MAKE) -s list-targets ) "\n"\
 
 .devcontainer/.env: environment.mk
 	echo ShellkitWorkspace=${ShellkitWorkspace} > .devcontainer/.env
