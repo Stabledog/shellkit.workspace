@@ -119,9 +119,11 @@ setup-workspace: environment.mk
 		[ -d $$(basename $${item}) ] || { \
 	    	git clone $$item ; \
 		};  \
-	 	cd $$(basename -- $$item) && [ -e ./make-kit.mk ] && { \
+	 	(  \
+			cd $$(basename -- $$item) && [ -e ./make-kit.mk ] && { \
 			   [ -d ./shellkit ] || git clone ${shellkit_codebase} ./shellkit ;  \
-			}; \
+			} \
+		); \
 	done; \
 	true;
 
