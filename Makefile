@@ -51,8 +51,8 @@ dcenv: .devcontainer/.env
 all_subgits: Makefile
 	@echo all_subgits=${all_subgits} | tee all_subgits
 
-.PHONY: git-status
-git-status:
+.PHONY: git-status gs
+git-status gs:
 	@echo "git status -s for all_subgits:" >&2; \
 	for item in ${all_subgits};  do \
 	( \

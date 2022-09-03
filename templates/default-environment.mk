@@ -21,5 +21,6 @@ setup_clone_urls:= \
 	https://github.com/sanekits/shellkit-meta \
 	https://github.com/sanekits/shellkit-pm \
 	https://github.com/sanekits/taskrc-kit \
+	https://github.com/sanekits/vscode-tools \
 
 ShellkitWorkspace=${absdir}
