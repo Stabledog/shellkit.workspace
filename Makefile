@@ -26,6 +26,8 @@ include environment.mk  # Symlink to environment-specific values
 
 DC:=docker-compose
 
+.PHONY: help
+help: list-targets
 
 .PHONY: list-targets
 list-targets:
