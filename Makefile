@@ -35,13 +35,13 @@ list-targets:
 
 .PHONY: print-environ
 print-environ: all_subgits environment.mk
-	@echo absdir=${absdir} "\n"\
-	ShellkitWorkspace=${ShellkitWorkspace} "\n"\
-	shellkit_codebase=${shellkit_codebase} "\n"\
-	all_subgits=${all_subgits} "\n"\
-	workspace_packages=${workspace_packages} "\n"\
-	devcontainer_build_deps=${devcontainer_build_deps} "\n"\
-	all_targets=$$( $(MAKE) -s list-targets ) "\n"\
+	@echo absdir=${absdir} 
+	@echo ShellkitWorkspace=${ShellkitWorkspace}
+	@echo shellkit_codebase=${shellkit_codebase} 
+	@echo all_subgits=${all_subgits}
+	@echo workspace_packages=${workspace_packages}
+	@echo devcontainer_build_deps=${devcontainer_build_deps}
+	@echo all_targets=$$( $(MAKE) -s list-targets )
 
 .devcontainer/.env: environment.mk
 	echo ShellkitWorkspace=${ShellkitWorkspace} > .devcontainer/.env
