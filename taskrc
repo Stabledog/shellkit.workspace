@@ -2,11 +2,23 @@
 # vim: filetype=sh :
 
 # If someone does a raw "source taskrc", we ensure that $taskrc_dir gets defined anyway
-[[ -z $taskrc_dir && -f taskrc ]] && export taskrc_dir=$PWD
+[[ -z $taskrc_dir && -f ./taskrc ]] && export taskrc_dir=$PWD
 
-#type -t localhist_set >/dev/null && { localhist_set ${taskrc_dir}/bash_history;  echo "HISTFILE is $HISTFILE"; }
+type -t localhist_set >/dev/null && {
+    alias tkr-lh="localhist_set ${taskrc_dir}/bash_history"
+    #Help: tkr-lh sets localhist to ${taskrc_dir}
+}
+
+tmk() {
+#Help: tmk help -- list targets; tmk -e -- edit taskrc.mk
+    [[ $1 == "-e" ]] || [[ $1 == "--edit" ]] && {
+        shift
+        vim $taskrc_dir/taskrc.mk "$@"
+    } || {
+        make -f ${taskrc_dir}/taskrc.mk "$@"
+    }
+}
 
 alias mk="make -f ${taskrc_dir}/Makefile"
-#Help
 complete -F _complete_alias mk
 
