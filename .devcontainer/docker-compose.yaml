@@ -1,7 +1,9 @@
 version: "3.4"
 services:
   shellkit-dev:
-    build: .
+    build: 
+        context: .
+        dockerfile: ./Dockerfile
     init: true
     command: sleep infinity
     volumes:
