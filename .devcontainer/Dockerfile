@@ -1,20 +1,24 @@
 # Dockerfile for shellkit.workspace/.devcontainer
 
-FROM shellkit-test-base:latest
-
-COPY ./bin/user-build.sh /bin/
-
-RUN test -f /bin/user-build.sh
+FROM shellkit-test-base:latest as vsudo-base
 
 RUN yum update -y \
     && yum install -y sudo \
     || apt-get update \
-    && apt-get install -y sudo 
+    && apt-get install -y sudo
 
-RUN echo '%sudo  ALL=(ALL:ALL) ALL' >> /etc/sudoers 
+COPY ./bin/user-build.sh /bin/
+
+RUN test -f /bin/user-build.sh \
+    && touch /.dockerenv \
+    && /bin/user-build.sh \
+    && echo '%sudo  ALL=(ALL:ALL) ALL' >> /etc/sudoers
+
+FROM vsudo-base as withtools
+
+RUN which curl && which make && which git || { \
+     apt-get install -y curl git make;  \
+}
 
 
-RUN ls / 
 
-RUN touch /.dockerenv \
-    && /bin/user-build.sh
