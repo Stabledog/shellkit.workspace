@@ -8,13 +8,17 @@ shellkit.workspace, or setting up a new dev environment, try the \"setup-workspa
 
 	exit 1
 
-# See https://stackoverflow.com/a/73509979/237059
+SHELL = /bin/bash
+
 absdir:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 shellkit_codebase:=https://github.com/sanekits/shellkit.git
 
 # Some shellkit-meta items are independent of shellkit, but honor the setup protocol:
-all_subgits:=$(shell ls -d */.git 2>/dev/null | xargs -n 1 dirname -- 2>/dev/null)
+all_subgits := $(shell ls -d */.git 2>/dev/null | xargs -n 1 dirname -- 2>/dev/null)
+
+all_shellkits := $(shell ls -d */shellkit/.git 2>/dev/null | xargs -n 1 dirname -- 2>/dev/null)
+
 
 devcontainer_build_deps:= \
 	.devcontainer/bin/user-build.sh \
@@ -35,10 +39,11 @@ list-targets:
 
 .PHONY: print-environ
 print-environ: all_subgits environment.mk
-	@echo absdir=${absdir} 
+	@echo absdir=${absdir}
 	@echo ShellkitWorkspace=${ShellkitWorkspace}
-	@echo shellkit_codebase=${shellkit_codebase} 
+	@echo shellkit_codebase=${shellkit_codebase}
 	@echo all_subgits=${all_subgits}
+	@echo all_shellkits=$(all_shellkits)
 	@echo workspace_packages=${workspace_packages}
 	@echo devcontainer_build_deps=${devcontainer_build_deps}
 	@echo all_targets=$$( $(MAKE) -s list-targets )
@@ -56,13 +61,12 @@ all_subgits: Makefile
 
 .PHONY: git-status gs
 git-status gs:
-	@echo "git status -s for all_subgits:" >&2; \
-	for item in ${all_subgits};  do \
+	@echo "git status -s for all:" >&2; \
+	for item in  $(all_shellkits) $(all_subgits) ;  do \
 	( \
 		cd $$item || exit 1 ;\
 		echo "$$item:" ;\
 		git status -s | sed -e 's/^/   /' ;\
-		echo; \
 	) || exit 1; \
 	done; \
 	echo "git status -s for $$PWD:" >&2; \
