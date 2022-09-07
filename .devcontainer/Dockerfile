@@ -17,7 +17,7 @@ RUN test -f /bin/user-build.sh \
 FROM vsudo-base as withtools
 
 RUN which curl && which make && which git || { \
-     apt-get install -y curl git make;  \
+     apt-get install -y curl git make rsync;  \
 }
 
 
