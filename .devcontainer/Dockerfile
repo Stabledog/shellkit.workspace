@@ -1,6 +1,6 @@
 # Dockerfile for shellkit.workspace/.devcontainer
 
-FROM shellkit-test-base:start as vsudo-base
+FROM shellkit-test-base:latest as vsudo-base
 
 SHELL ["/bin/bash", "-c"]
 
