@@ -2,6 +2,8 @@
 
 FROM shellkit-test-base:start as vsudo-base
 
+SHELL ["/bin/bash", "-c"]
+
 RUN which yum && { \
         yum update -y \
         && yum install -y sudo; \

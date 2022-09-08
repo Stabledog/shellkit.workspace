@@ -1,12 +1,16 @@
-# taskrc.mk for shellkit.workspace/.devcontainer
+# taskrc.mk for .devcontainer
 #
+#  TODO: add targets for your project here.  When you run
+#  "tmk <target-name>", the current dir will not change but
+#  this makefile will be invoked.
 
 
-absdir:=$(taskrc_dir)
-REMAKE := $(MAKE) -C $(absdir) -s -f $(lastword $(MAKEFILE_LIST))
+# See https://stackoverflow.com/a/73509979/237059
+absdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SHELL := /bin/bash
+REMAKE := $(MAKE) -C $(absdir) -s -f $(lastword $(MAKEFILE_LIST))
 
-container_name = shellkit-dev
+base_imgtag=shellkit-test-base:latest
 
 .PHONY: help
 help:
@@ -17,32 +21,40 @@ help:
 			{ print substr($$1, 1, length($$1)-1) }' | \
 	sort | \
 	pr --omit-pagination --width=100 --columns=3
-	@echo "taskrc_dir=$(taskrc_dir)"
-	@echo "CURDIR=$(CURDIR)"
+	@echo -e "taskrc_dir=\t$${taskrc_dir}"
+	@echo -e "CURDIR=\t\t$(CURDIR)"
 
 .PHONY: shellkit-test-base
 shellkit-test-base .semaphore/shellkit-test-base: Dockerfile
-	@[[ -n $(DISABLE_DOCKERHUB) ]] || { \
+	imgtag=$(base_imgtag); \
+	[[ -n "$(DISABLE_DOCKERHUB)" ]] && { \
+		echo "WARNING: DISABLE_DOCKERHUB is set.  We're just checking for local image named $$imgtag to use as a build base." >&2; \
+		docker image inspect $$imgtag >/dev/null; \
+		touch .semaphore/shellkit-test-base; \
+	} || { \
+		echo "DISABLE_DOCKERHUB is not set." >&2; \
 		docker pull ubuntu \
-		&& docker tag ubuntu shellkit-test-base:latest \
+		&& docker tag ubuntu $$imgtag \
 		&& touch .semaphore/shellkit-test-base; \
-	}
+	};
+	true
 
-include
 
-.PHONY: shellkit-test-vsudo
-shellkit-test-vsudo .semaphore/shellkit-test-vsudo: .semaphore/shellkit-test-base
+.semaphore/shellkit-test-vsudo: .semaphore/shellkit-test-base
 	@# Base image with just vscode-user + sudo powers
 	docker build --target vsudo-base -t shellkit-test-vsudo:latest . \
 	&& echo "shellkit-test-vsudo:latest image built OK" >&2
 	touch .semaphore/shellkit-test-vsudo
+.PHONY: shellkit-test-vsudo
+shellkit-test-vsudo: .semaphore/shellkit-test-vsudo
 
-.PHONY: shellkit-test-withtools
-shellkit-test-withtools .semaphore/shellkit-test-withtools: .semaphore/shellkit-test-vsudo
+.semaphore/shellkit-test-withtools: .semaphore/shellkit-test-vsudo
 	@# Vsudo image with basic maintenance tools (git, curl, make)
 	docker build --target withtools -t shellkit-test-withtools:latest . \
 	&& echo "shellkit-test-withtools image built OK" >&2
 	touch .semaphore/shellkit-test-withtools
+.PHONY: shellkit-test-withtools
+shellkit-test-withtools: .semaphore/shellkit-test-withtools
 
 .PHONY: dc-up
 dc-up .semaphore/dc-up: .semaphore/shellkit-test-base
