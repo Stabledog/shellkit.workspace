@@ -24,7 +24,6 @@ tmk() {
             ;;
     esac
     command make -s -C ${taskrc_dir} -f ${taskrc_dir}/taskrc.mk "$@"
-    }
 }
 
 

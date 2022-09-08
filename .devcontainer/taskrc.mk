@@ -24,8 +24,7 @@ help:
 	@echo -e "taskrc_dir=\t$${taskrc_dir}"
 	@echo -e "CURDIR=\t\t$(CURDIR)"
 
-.PHONY: shellkit-test-base
-shellkit-test-base .semaphore/shellkit-test-base: Dockerfile
+.semaphore/shellkit-test-base: Dockerfile
 	imgtag=$(base_imgtag); \
 	[[ -n "$(DISABLE_DOCKERHUB)" ]] && { \
 		echo "WARNING: DISABLE_DOCKERHUB is set.  We're just checking for local image named $$imgtag to use as a build base." >&2; \
@@ -38,6 +37,8 @@ shellkit-test-base .semaphore/shellkit-test-base: Dockerfile
 		&& touch .semaphore/shellkit-test-base; \
 	};
 	true
+.PHONY: shellkit-test-base
+shellkit-test-base: .semaphore/shellkit-test-base Dockerfile
 
 
 .semaphore/shellkit-test-vsudo: .semaphore/shellkit-test-base
