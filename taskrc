@@ -15,10 +15,8 @@ tmk() {
         shift
         vim $taskrc_dir/taskrc.mk "$@"
     } || {
-        make -f ${taskrc_dir}/taskrc.mk "$@"
+        make -C ${taskrc_dir} -f ${taskrc_dir}/taskrc.mk "$@"
     }
 }
 
-alias mk="make -f ${taskrc_dir}/Makefile"
-complete -F _complete_alias mk
 

@@ -6,9 +6,11 @@
 
 
 # See https://stackoverflow.com/a/73509979/237059
-absdir:=$(taskrc_dir)
+# See https://stackoverflow.com/a/73509979/237059
+absdir:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 REMAKE := $(MAKE) -f $(lastword $(MAKEFILE_LIST))
+SHELL := /bin/bash
 
 .PHONY: help
 help:
@@ -20,6 +22,26 @@ help:
 	sort | \
 	pr --omit-pagination --width=100 --columns=3
 
-.PHONY: my-target-1
-my-target-1:
-	@echo "Hello my-target-1, PWD=$$PWD, taskrc_dir=$$taskrc_dir"
+.PHONY: grepall
+
+grepall:
+    # Search all files in git from $PWD recursively.  If grepall_pattern is set,
+    # the file list will be passed to grep.  Otherwise the file list itself is printed.
+	@cd $(absdir) && \
+		find -type d -name '.git' \
+		| grep -v '/shellkit/' \
+		| cat - <(echo ./shellkit-pm/shellkit/.git ) \
+		| sed -e 's^\.git$$^^' > /tmp/tmp-grepall-$$$$; \
+		while read xdir; do \
+			( cd $$xdir && git ls-files | sed -e "s%^%$$xdir%" ); \
+		done < /tmp/tmp-grepall-$$$$ > /tmp/tmp-grepall-2-$$$$; \
+		[[ -n "$(grepall_pattern)" ]] && { \
+			grep -E '$(grepall_pattern)'  $$(cat /tmp/tmp-grepall-2-$$$$) 2>/dev/null; \
+			true; \
+		} || { \
+			cat /tmp/tmp-grepall-2-$$$$; \
+		}; \
+		rm /tmp/tmp-grepall-$$$$ /tmp/tmp-grepall-2-$$$$ &>/dev/null; \
+
+
+
