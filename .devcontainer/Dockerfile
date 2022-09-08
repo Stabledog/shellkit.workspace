@@ -27,5 +27,8 @@ RUN pkgs="curl make git rsync"; \
         && apt-get install -y $pkgs;  \
     }
 
+FROM withtools as withpython
+
+RUN apt-get update && apt-get install -y python3.8
 
 
