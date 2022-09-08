@@ -4,6 +4,8 @@
 
 absdir:=$(taskrc_dir)
 REMAKE := $(MAKE) -C $(absdir) -s -f $(lastword $(MAKEFILE_LIST))
+SHELL := /bin/bash
+
 container_name = shellkit-dev
 
 .PHONY: help
@@ -20,9 +22,13 @@ help:
 
 .PHONY: shellkit-test-base
 shellkit-test-base .semaphore/shellkit-test-base: Dockerfile
-	docker pull ubuntu
-	docker tag ubuntu shellkit-test-base:latest
-	touch .semaphore/shellkit-test-base
+	@[[ -n $(DISABLE_DOCKERHUB) ]] || { \
+		docker pull ubuntu \
+		&& docker tag ubuntu shellkit-test-base:latest \
+		&& touch .semaphore/shellkit-test-base; \
+	}
+
+include
 
 .PHONY: shellkit-test-vsudo
 shellkit-test-vsudo .semaphore/shellkit-test-vsudo: .semaphore/shellkit-test-base
@@ -46,7 +52,7 @@ dc-up .semaphore/dc-up: .semaphore/shellkit-test-base
 .PHONY: dc-down
 dc-down:
 	docker-compose down
-	rm .semaphore/dc-down
+	rm .semaphore/dc-up
 
 .PHONY: dc-shell
 dc-shell: .semaphore/dc-up
