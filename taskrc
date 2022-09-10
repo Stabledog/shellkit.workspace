@@ -23,3 +23,14 @@ grepall() {
     #Help search all git-controlled files for pattern $@
     grepall_pattern="$*" tmk -s grepall
 }
+
+devcode() {
+    #Help open the workspace in vscode devcontainer
+    [[ -f bb-shellkit/environ/ ]] && {
+        ln -sf bb-shellkit/environ/shellkit-workspace-environment.mk.$(hostname) ${taskrc_dir}/environment.mk
+    }
+    devcontainer open ${taskrc_dir}
+}
+
+alias bootstrap-dev='tmk bootstrap-dev'
+#Help Install all kits in current environment
