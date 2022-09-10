@@ -27,6 +27,12 @@ RUN pkgs="curl make git rsync less"; \
         && apt-get install -y $pkgs;  \
     }
 
+RUN yum install -y openssh-clients \
+    || { \
+        apt-get install openssh-clients; \
+    }
+
+
 FROM withtools as withpython
 
 RUN apt-get update && apt-get install -y python3.8
