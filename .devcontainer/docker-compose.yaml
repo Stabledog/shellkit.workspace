@@ -10,6 +10,7 @@ services:
       - ${ShellkitWorkspace}/.devcontainer:/devcontainer:ro
       - ${HOME}:/host_home:ro
       - ${ShellkitWorkspace}:/workspace:cached
+      - ${HOME}/.aws:/home/vscode/.aws
       - vdata:/vdata
 
 volumes:
