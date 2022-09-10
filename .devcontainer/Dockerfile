@@ -21,7 +21,7 @@ RUN test -f /bin/user-build.sh \
 
 FROM vsudo-base as withtools
 
-RUN pkgs="curl make git rsync"; \
+RUN pkgs="curl make git rsync less"; \
     which $pkgs || { \
         apt-get update \
         && apt-get install -y $pkgs;  \
