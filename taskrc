@@ -32,5 +32,11 @@ devcode() {
     devcontainer open ${taskrc_dir}
 }
 
-alias bootstrap-dev='tmk bootstrap-dev'
-#Help Install all kits in current environment
+docker_install_all_kits() {
+#Help Install all kits from the host's ~/.local/bin
+    make -C ${taskrc_dir} -f ${taskrc_dir}/Makefile docker-install-all-kits && \
+    source ~/.bashrc ; \
+    echo Shell reloaded.
+}
+
+

@@ -226,7 +226,7 @@ code-devcontainer-open: code-devcontainer-build dcenv
 .PHONY: docker-install-all-kits
 docker-install-all-kits:
 	@# Install from /host_home/.local/bin into ~/.local/bin
-	for kit in $(all_installables); do \
+	@for kit in $(all_installables); do \
 		[[ -f /host_home/.local/bin/$${kit}/setup.sh ]] && { \
 			/host_home/.local/bin/$${kit}/setup.sh ; \
 		}; \
