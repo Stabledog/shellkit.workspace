@@ -19,6 +19,7 @@ all_subgits := $(shell ls -d */.git 2>/dev/null | xargs -n 1 dirname -- 2>/dev/n
 
 all_shellkits := $(shell ls -d */shellkit/.git 2>/dev/null | xargs -n 1 dirname -- 2>/dev/null)
 
+all_installables := $(shell ls */*/setup.sh | sed -e 's%/bin/setup.sh%%')
 
 devcontainer_build_deps:= \
 	.devcontainer/bin/user-build.sh \
@@ -44,6 +45,7 @@ print-environ: all_subgits environment.mk
 	@echo shellkit_codebase=${shellkit_codebase}
 	@echo all_subgits=${all_subgits}
 	@echo all_shellkits=$(all_shellkits)
+	@echo all_installables=$(all_installables)
 	@echo workspace_packages=${workspace_packages}
 	@echo devcontainer_build_deps=${devcontainer_build_deps}
 	@echo all_targets=$$( $(MAKE) -s list-targets )
@@ -220,6 +222,16 @@ code-devcontainer-build: shellkit-test-base-exists devcontainer-bin-installed dc
 code-devcontainer-open: code-devcontainer-build dcenv
 	@# Launch vscode using the devcontainer --open command
 	devcontainer open
+
+.PHONY: docker-install-all-kits
+docker-install-all-kits:
+	@# Install from /host_home/.local/bin into ~/.local/bin
+	for kit in $(all_installables); do \
+		[[ -f /host_home/.local/bin/$${kit}/setup.sh ]] && { \
+			/host_home/.local/bin/$${kit}/setup.sh ; \
+		}; \
+		true; \
+	done;
 
 
 
