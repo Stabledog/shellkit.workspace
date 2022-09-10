@@ -121,6 +121,7 @@ for whatever's in it!"
 	exit 1
 
 environment.mk: ${HOME}/.shellkit-environment.mk
+	ln -sf ${HOME}/.shellkit-environment.mk environment.mk
 
 .PHONY: setup-workspace
 setup-workspace: environment.mk
