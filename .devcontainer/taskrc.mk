@@ -24,53 +24,53 @@ help:
 	@echo -e "taskrc_dir=\t$${taskrc_dir}"
 	@echo -e "CURDIR=\t\t$(CURDIR)"
 
-.semaphore/shellkit-test-base: Dockerfile
+.flag/shellkit-test-base: Dockerfile
 	imgtag=$(base_imgtag); \
 	[[ -n "$(DISABLE_DOCKERHUB)" ]] && { \
 		echo "WARNING: DISABLE_DOCKERHUB is set.  We're just checking for local image named $$imgtag to use as a build base." >&2; \
 		docker image inspect $$imgtag >/dev/null; \
-		touch .semaphore/shellkit-test-base; \
+		touch .flag/shellkit-test-base; \
 	} || { \
 		echo "DISABLE_DOCKERHUB is not set." >&2; \
 		docker pull ubuntu \
 		&& docker tag ubuntu $$imgtag \
-		&& touch .semaphore/shellkit-test-base; \
+		&& touch .flag/shellkit-test-base; \
 	};
 	true
 .PHONY: shellkit-test-base
-shellkit-test-base: .semaphore/shellkit-test-base Dockerfile
+shellkit-test-base: .flag/shellkit-test-base Dockerfile
 
 
-.semaphore/shellkit-test-vsudo: .semaphore/shellkit-test-base
+.flag/shellkit-test-vsudo: .flag/shellkit-test-base
 	@# Base image with just vscode-user + sudo powers
 	docker build --target vsudo-base -t shellkit-test-vsudo:latest . \
 	&& echo "shellkit-test-vsudo:latest image built OK" >&2
-	touch .semaphore/shellkit-test-vsudo
+	touch .flag/shellkit-test-vsudo
 .PHONY: shellkit-test-vsudo
-shellkit-test-vsudo: .semaphore/shellkit-test-vsudo
+shellkit-test-vsudo: .flag/shellkit-test-vsudo
 
-.semaphore/shellkit-test-withtools: .semaphore/shellkit-test-vsudo
+.flag/shellkit-test-withtools: .flag/shellkit-test-vsudo
 	@# Vsudo image with basic maintenance tools (git, curl, make)
 	docker build --target withtools -t shellkit-test-withtools:latest . \
 	&& echo "shellkit-test-withtools image built OK" >&2
-	touch .semaphore/shellkit-test-withtools
+	touch .flag/shellkit-test-withtools
 .PHONY: shellkit-test-withtools
-shellkit-test-withtools: .semaphore/shellkit-test-withtools
+shellkit-test-withtools: .flag/shellkit-test-withtools
 
 .PHONY: dc-up
-dc-up .semaphore/dc-up: .semaphore/shellkit-test-base
+dc-up .flag/dc-up: .flag/shellkit-test-base
 	docker-compose up
-	touch .semaphore/dc-up
+	touch .flag/dc-up
 
 .PHONY: dc-down
 dc-down:
 	docker-compose down
-	rm .semaphore/dc-up
+	rm .flag/dc-up
 
 .PHONY: dc-shell
-dc-shell: .semaphore/dc-up
+dc-shell: .flag/dc-up
 	docker-compose exec -w /workspace -u vscode $(container_name) bash
 
 .PHONY: clean
 clean:
-	rm .semaphore/*
+	rm .flag/*
