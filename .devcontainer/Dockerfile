@@ -29,7 +29,7 @@ RUN pkgs="curl make git rsync less"; \
 
 RUN yum install -y openssh-clients \
     || { \
-        apt-get install openssh-clients; \
+        apt-get install openssh-client; \
     }
 
 

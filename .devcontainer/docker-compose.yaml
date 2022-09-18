@@ -12,6 +12,7 @@ services:
       - ${ShellkitWorkspace}:/workspace:cached
       - ${HOME}/.aws:/home/vscode/.aws
       - vdata:/vdata
+    user: vscode
 
 volumes:
     vdata:
