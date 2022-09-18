@@ -9,7 +9,8 @@ RUN which yum && { \
         && yum install -y sudo; \
     } || { \
        apt-get update \
-        && apt-get install -y sudo; \
+        && apt-get install -y sudo locales \
+        && locale-gen "en_US.UTF-8" ; \
     }
 
 COPY ./bin/user-build.sh /bin/
