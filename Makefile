@@ -79,14 +79,12 @@ git-status gs:
 git-pull:
 	@echo "Pull ${PWD}:"
 	git pull
-	@echo all_subgits;
-	for item in ${all_subgits}; \
+	for item in $(all_subgits) $(all_shellkits); \
 	  do ( echo "[$${item}]" ; cd $${item} && git pull )  ;  done
 
 .PHONY: git-push
 git-push:
-	@echo all_subgits;
-	for item in ${all_subgits}; \
+	for item in $(all_subgits); \
 	  do ( echo '$$\n' "[$${item}]" ; cd $${item} && git push ; git status; echo "[End of: $$item]")  ;  done
 	git push
 
