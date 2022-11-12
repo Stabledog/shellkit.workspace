@@ -19,3 +19,4 @@ bb-dev-launch
 looper
 prompt-command-wrap
 bashics
+.shellkit-environment.mk
