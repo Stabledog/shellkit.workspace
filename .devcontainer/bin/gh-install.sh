@@ -48,6 +48,19 @@ main() {
         || die 103.4
     $Apt update && $Apt install gh -y || die 103.5
     which gh || die 103.6
+
+    cp /tmp/build/.gh-helprc /root && {
+        echo "Found and copied /tmp/build/.gh-helprc to /root"
+        cp /root/.gh-helprc /home/vscode/.gh-helprc && {
+            chown vscode:vscode /home/vscode/.gh-helprc
+            echo "Copied /home/vscode/.gh-helprc from /root"
+        } || {
+            echo "Can't symlink /home/vscode/.gh-helprc"
+        }
+    } || {
+        echo "No /tmp/build/.gh-helprc found in $scriptName"
+    }
+    chmod oug+r /root/.gh-helprc
 }
 
 [[ -z ${sourceMe} ]] && {

@@ -1,7 +1,7 @@
 version: "3.4"
 services:
   shellkit-dev:
-    image: shellkit-test-withtools
+    image: localbuilt/shellkit-test-withtools:latest
     init: true
     command: sleep infinity
     volumes:

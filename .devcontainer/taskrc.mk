@@ -23,10 +23,10 @@ help:
 
 .flag/metabase:
 	docker pull $(metabase_bb)
-	docker tag $(metabase_bb) $(base_imgtag)
+	docker tag $(metabase_bb) localbuilt/$(base_imgtag)
 
 .flag/shellkit-test-base: Dockerfile .flag/metabase
-	imgtag=$(base_imgtag); \
+	imgtag=localbuilt/$(base_imgtag); \
 	[[ -n "$(DISABLE_DOCKERHUB)" ]] && { \
 		echo "WARNING: DISABLE_DOCKERHUB is set.  We're just checking for local image named $$imgtag to use as a build base." >&2; \
 		docker image inspect $$imgtag >/dev/null; \
@@ -44,18 +44,21 @@ shellkit-test-base: .flag/shellkit-test-base Dockerfile
 
 .flag/shellkit-test-vsudo: .flag/shellkit-test-base
 	@# Base image with just vscode-user + sudo powers
-	BUILDKIT_PROGRESS=plain docker build --target vsudo-base -t shellkit-test-vsudo:latest . \
-	&& echo "shellkit-test-vsudo:latest image built OK" >&2
+	BUILDKIT_PROGRESS=plain docker build --target vsudo-base \
+		-t localbuilt/shellkit-test-vsudo:latest . \
+	&& echo "localbuilt/shellkit-test-vsudo:latest image built OK" >&2
 	touch .flag/shellkit-test-vsudo
 .PHONY: shellkit-test-vsudo
 shellkit-test-vsudo: .flag/shellkit-test-vsudo
 
 .flag/shellkit-test-withtools: .flag/shellkit-test-vsudo
 	@# Vsudo image with basic maintenance tools (git, curl, make)
+	[[ -f ~/.gh-helprc ]] && cp ~/.gh-helprc ./
 	set -x; BUILDKIT_PROGRESS=plain docker build \
 		--build-arg https_proxy=$$https_proxy \
-		--target withtools -t shellkit-test-withtools:latest . \
-	&& echo "shellkit-test-withtools image built OK" >&2
+		--target withtools \
+		-t localbuilt/shellkit-test-withtools:latest . \
+	&& echo "localbuilt/shellkit-test-withtools image built OK" >&2
 	touch .flag/shellkit-test-withtools
 
 .PHONY: shellkit-test-withtools

@@ -2,7 +2,7 @@
 
 ARG https_proxy
 
-FROM shellkit-test-base:latest as vsudo-base
+FROM localbuilt/shellkit-test-base:latest as vsudo-base
 
 SHELL ["/bin/bash", "-c"]
 
@@ -25,7 +25,7 @@ RUN test -f /bin/user-build.sh \
 
 FROM vsudo-base as withtools
 
-RUN pkgs="curl make git rsync less"; \
+RUN pkgs="curl make unzip git rsync less"; \
     which $pkgs || { \
         apt-get update \
         && apt-get install -y $pkgs;  \
@@ -36,12 +36,19 @@ RUN yum install -y openssh-clients docker \
         DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client docker; \
     }
 
-COPY ./bin/gh-install.sh /bin/
-ENV https_proxy=$https_proxy
-RUN echo "hello-foo[$https_proxy]" && /bin/gh-install.sh
-
-FROM withtools as withpython
-
 RUN apt-get update && apt-get install -y python3.8
+
+COPY ./ /tmp/build/
+
+ENV https_proxy=$https_proxy
+COPY ./bin/aws-install.sh /bin/
+RUN /bin/aws-install.sh /bin/
+
+COPY ./bin/gh-install.sh /bin/
+RUN /bin/gh-install.sh
+
+
+# There's a git credential helper we don't like:
+RUN mv /etc/gitconfig /etc/gitconfig.bak.$$
 
 
