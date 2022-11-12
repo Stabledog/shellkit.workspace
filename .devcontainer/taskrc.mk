@@ -6,8 +6,8 @@ absdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SHELL := /bin/bash
 REMAKE := $(MAKE) -C $(absdir) -s -f $(lastword $(MAKEFILE_LIST))
 
-base_imgtag=shellkit-test-base:latest
-metabase_bb=artprod.dev.bloomberg.com/bbgo/golang:ubuntu20
+base_imgtag := shellkit-test-base:latest
+metabase_bb := $(shell bash bin/get_metabase.sh 2>/dev/null)
 
 .PHONY: help
 help:
@@ -22,22 +22,17 @@ help:
 	@echo -e "CURDIR=\t\t$(CURDIR)"
 
 .flag/metabase:
+	echo Image: $(metabase_bb)
 	docker pull $(metabase_bb)
 	docker tag $(metabase_bb) localbuilt/$(base_imgtag)
+	touch .flag/metabase
 
 .flag/shellkit-test-base: Dockerfile .flag/metabase
-	imgtag=localbuilt/$(base_imgtag); \
-	[[ -n "$(DISABLE_DOCKERHUB)" ]] && { \
-		echo "WARNING: DISABLE_DOCKERHUB is set.  We're just checking for local image named $$imgtag to use as a build base." >&2; \
-		docker image inspect $$imgtag >/dev/null; \
-		touch .flag/shellkit-test-base; \
-	} || { \
-		echo "DISABLE_DOCKERHUB is not set." >&2; \
-		BUILDKIT_PROGRESS=plain docker pull ubuntu \
-		&& docker tag ubuntu $$imgtag \
-		&& touch .flag/shellkit-test-base; \
-	};
-	true
+	docker image inspect localbuilt/$(base_imgtag) >/dev/null;  \
+	BUILDKIT_PROGRESS=plain docker pull $(metabase_bb) \
+		&& docker tag $(metabase_bb) localbuilt/$(base_imgtag); \
+	touch .flag/shellkit-test-base;
+
 .PHONY: shellkit-test-base
 shellkit-test-base: .flag/shellkit-test-base Dockerfile
 
@@ -80,4 +75,4 @@ dc-shell: .flag/dc-up
 
 .PHONY: clean
 clean:
-	rm .flag/*
+	-rm .flag/* 2>/dev/null
