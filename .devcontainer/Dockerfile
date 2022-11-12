@@ -4,11 +4,12 @@ FROM shellkit-test-base:latest as vsudo-base
 
 SHELL ["/bin/bash", "-c"]
 
-RUN which yum && { \
+RUN set -x; which yum && { \
         yum update -y \
         && yum install -y sudo; \
     } || { \
-       apt-get update \
+        echo "No yum, trying apt-get:"; \
+        apt-get update -y \
         && apt-get install -y sudo locales \
         && locale-gen "en_US.UTF-8" ; \
     }
@@ -28,9 +29,9 @@ RUN pkgs="curl make git rsync less"; \
         && apt-get install -y $pkgs;  \
     }
 
-RUN yum install -y openssh-clients \
+RUN yum install -y openssh-clients docker \
     || { \
-        apt-get install openssh-client; \
+        DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client docker; \
     }
 
 

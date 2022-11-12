@@ -1,9 +1,5 @@
 # taskrc.mk for .devcontainer
 #
-#  TODO: add targets for your project here.  When you run
-#  "tmk <target-name>", the current dir will not change but
-#  this makefile will be invoked.
-
 
 # See https://stackoverflow.com/a/73509979/237059
 absdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -11,6 +7,7 @@ SHELL := /bin/bash
 REMAKE := $(MAKE) -C $(absdir) -s -f $(lastword $(MAKEFILE_LIST))
 
 base_imgtag=shellkit-test-base:latest
+metabase_bb=artprod.dev.bloomberg.com/bbgo/golang:ubuntu20
 
 .PHONY: help
 help:
@@ -24,7 +21,11 @@ help:
 	@echo -e "taskrc_dir=\t$${taskrc_dir}"
 	@echo -e "CURDIR=\t\t$(CURDIR)"
 
-.flag/shellkit-test-base: Dockerfile
+.flag/metabase:
+	docker pull $(metabase_bb)
+	docker tag $(metabase_bb) $(base_imgtag)
+
+.flag/shellkit-test-base: Dockerfile .flag/metabase
 	imgtag=$(base_imgtag); \
 	[[ -n "$(DISABLE_DOCKERHUB)" ]] && { \
 		echo "WARNING: DISABLE_DOCKERHUB is set.  We're just checking for local image named $$imgtag to use as a build base." >&2; \
@@ -32,7 +33,7 @@ help:
 		touch .flag/shellkit-test-base; \
 	} || { \
 		echo "DISABLE_DOCKERHUB is not set." >&2; \
-		docker pull ubuntu \
+		BUILDKIT_PROGRESS=plain docker pull ubuntu \
 		&& docker tag ubuntu $$imgtag \
 		&& touch .flag/shellkit-test-base; \
 	};
@@ -43,7 +44,7 @@ shellkit-test-base: .flag/shellkit-test-base Dockerfile
 
 .flag/shellkit-test-vsudo: .flag/shellkit-test-base
 	@# Base image with just vscode-user + sudo powers
-	docker build --target vsudo-base -t shellkit-test-vsudo:latest . \
+	BUILDKIT_PROGRESS=plain docker build --target vsudo-base -t shellkit-test-vsudo:latest . \
 	&& echo "shellkit-test-vsudo:latest image built OK" >&2
 	touch .flag/shellkit-test-vsudo
 .PHONY: shellkit-test-vsudo
@@ -51,7 +52,7 @@ shellkit-test-vsudo: .flag/shellkit-test-vsudo
 
 .flag/shellkit-test-withtools: .flag/shellkit-test-vsudo
 	@# Vsudo image with basic maintenance tools (git, curl, make)
-	docker build --target withtools -t shellkit-test-withtools:latest . \
+	BUILDKIT_PROGRESS=plain docker build --target withtools -t shellkit-test-withtools:latest . \
 	&& echo "shellkit-test-withtools image built OK" >&2
 	touch .flag/shellkit-test-withtools
 .PHONY: shellkit-test-withtools

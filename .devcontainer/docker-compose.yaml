@@ -10,6 +10,8 @@ services:
       - ${ShellkitWorkspace}:/workspace:cached
       - ${HOME}/.aws:/home/vscode/.aws
       - ${HOME}/.ssh:/home/vscode/.ssh:ro
+      - ${HOME}/.gitconfig:/home/vscode/.gitconfig:ro
+      - /var/run/docker.sock:/var/run/docker.sock
       - vdata:/vdata
     user: vscode
 
