@@ -9,6 +9,7 @@ services:
       - ${HOME}:/host_home:ro
       - ${ShellkitWorkspace}:/workspace:cached
       - ${HOME}/.aws:/home/vscode/.aws
+      - ${HOME}/.ssh:/home/vscode/.ssh:ro
       - vdata:/vdata
     user: vscode
 
