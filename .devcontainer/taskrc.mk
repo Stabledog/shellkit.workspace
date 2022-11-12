@@ -52,9 +52,12 @@ shellkit-test-vsudo: .flag/shellkit-test-vsudo
 
 .flag/shellkit-test-withtools: .flag/shellkit-test-vsudo
 	@# Vsudo image with basic maintenance tools (git, curl, make)
-	BUILDKIT_PROGRESS=plain docker build --target withtools -t shellkit-test-withtools:latest . \
+	set -x; BUILDKIT_PROGRESS=plain docker build \
+		--build-arg https_proxy=$$https_proxy \
+		--target withtools -t shellkit-test-withtools:latest . \
 	&& echo "shellkit-test-withtools image built OK" >&2
 	touch .flag/shellkit-test-withtools
+
 .PHONY: shellkit-test-withtools
 shellkit-test-withtools: .flag/shellkit-test-withtools
 

@@ -1,5 +1,7 @@
 # Dockerfile for shellkit.workspace/.devcontainer
 
+ARG https_proxy
+
 FROM shellkit-test-base:latest as vsudo-base
 
 SHELL ["/bin/bash", "-c"]
@@ -34,6 +36,9 @@ RUN yum install -y openssh-clients docker \
         DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client docker; \
     }
 
+COPY ./bin/gh-install.sh /bin/
+ENV https_proxy=$https_proxy
+RUN echo "hello-foo[$https_proxy]" && /bin/gh-install.sh
 
 FROM withtools as withpython
 
