@@ -28,7 +28,7 @@ main() {
     curl -I --max-time 3 "https://artprod.dev.bloomberg.com" &>/dev/null && {
         echo "artprod.dev.bloomberg.com/bbgo/golang:ubuntu20"
     } || {
-        echo "golang:1.19-buster"
+        echo "golang:1.19-bullseye"
     }
 }
 

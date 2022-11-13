@@ -36,9 +36,10 @@ RUN yum install -y openssh-clients docker \
         DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client docker; \
     }
 
-RUN apt-get update && apt-get install -y python3.8
 
 COPY ./ /tmp/build/
+RUN /tmp/build/bin/py-install.sh --target-version 3.8
+RUN bash -l -c 'python3.8 --version'
 
 ENV https_proxy=$https_proxy
 COPY ./bin/aws-install.sh /bin/
@@ -49,6 +50,6 @@ RUN /bin/gh-install.sh
 
 
 # There's a git credential helper we don't like:
-RUN mv /etc/gitconfig /etc/gitconfig.bak.$$
+RUN mv /etc/gitconfig /etc/gitconfig.bak.$$ || :
 
 

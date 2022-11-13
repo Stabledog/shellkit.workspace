@@ -1,0 +1,9 @@
+# basic init for docker shell
+source ~/.profile
+for kit in bashics localhist cdpp ps1-foo looper; do
+    /host_home/.local/bin/${kit}/setup.sh
+done
+PS1=1 source ~/.bashrc
+HISTFILE=/workspace/bash_history
+history -r
+set -o vi

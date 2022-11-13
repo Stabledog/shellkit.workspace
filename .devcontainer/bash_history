@@ -1,0 +1,120 @@
+#1668346468
+cat .profile
+#1668346476
+cat .bashrc
+#1668346501
+source shellkit-loader.bashrc
+#1668346503
+./shellkit-loader.sh
+#1668346526
+set -x; source ~/.bashrc
+#1668346550
+echo $PS1
+#1668346581
+HISTFILE=/workspace/bash_history
+#1668346620
+h
+#1668346622
+lh
+#1668346631
+h
+#1668346694
+/workspace/bin/py-install.sh --target-version 3.8
+#1668351333
+exit
+bash -l
+exit
+h
+lh
+exit
+#1668351491
+lr
+#1668351493
+lh
+#1668351493
+h
+#1668351499
+/workspace/bin/py-install.sh --target-version 3.8
+#1668351541
+python3.8
+#1668351618
+h
+#1668351622
+/workspace/bin/py-install.sh --target-version 3.8
+#1668351634
+rm -rf /root/.pyenv; /workspace/bin/py-install.sh --target-version 3.8
+#1668351650
+pyenv global
+#1668351655
+pyenv global 3.8
+#1668351657
+pyenv list
+#1668351658
+pyenv
+#1668351662
+exec bash
+#1668351662
+exec bash
+#1668351751
+echo $PATH
+#1668351756
+pyenv
+#1668351796
+exit
+#1668351658
+pyenv
+#1668351662
+exec bash
+#1668351662
+exec bash
+#1668351751
+echo $PATH
+#1668351756
+pyenv
+#1668351796
+exit
+#1668351950
+h
+#1668351958
+rm -rf /root/.pyenv; /workspace/bin/py-install.sh --target-version 3.8
+#1668352251
+python3.8
+#1668352469
+exit
+#1668351803
+h
+#1668351811
+rm -rf /root/.pyenv; /workspace/bin/py-install.sh --target-version 3.8
+#1668351852
+pyevn
+#1668351856
+pyenv
+#1668351859
+bash -l
+#1668352470
+exit
+bash -l
+exit
+exit
+#1668353010
+ls /tmp
+#1668353027
+bash -l -c 'python3.8 --version'; echo $?
+#1668353033
+pyenv
+#1668353035
+bash -l
+#1668353332
+exit
+#1668355425
+sudo chown $USER:$USER bash_history 
+#1668355440
+lr
+#1668355453
+lh
+#1668355483
+gs
+#1668355485
+ga .
+#1668355486
+gs
