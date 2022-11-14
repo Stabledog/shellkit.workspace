@@ -50,7 +50,7 @@ shellkit-test-vsudo: .flag/shellkit-test-vsudo
 	@# Vsudo image with basic maintenance tools (git, curl, make)
 	[[ -f ~/.gh-helprc ]] && cp ~/.gh-helprc ./
 	set -x; BUILDKIT_PROGRESS=plain docker build \
-		--build-arg https_proxy=$$https_proxy \
+		--build-arg http_proxy=$$http_proxy \
 		--target withtools \
 		-t localbuilt/shellkit-test-withtools:latest . \
 	&& echo "localbuilt/shellkit-test-withtools image built OK" >&2

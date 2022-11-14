@@ -10,6 +10,8 @@ die() {
     builtin exit 1
 }
 
+pyenv_url=pyenv.run
+
 stub() {
     # Print debug output to stderr.  Recommend to call like this:
     #   stub "${FUNCNAME[0]}.${LINENO}" "$@" "<Put your message here>"
@@ -32,7 +34,7 @@ EOF
 }
 
 install_py_build_depends() {
-    apt update && apt install -y \
+    apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
         make  \
         build-essential  \
         libssl-dev  \
@@ -54,7 +56,6 @@ install_py_build_depends() {
 
 install_pyenv() {
     install_py_build_depends || die "install_py_build_depends failed"
-    local pyenv_url=https://pyenv.run
     curl -I ${pyenv_url}  --max-time 4 &>/dev/null || die "Can't connect to ${pyenv_url}"
     touch ~/.tmp1-deleteme || die "Can't write to dir ~/"
     local bakFile=~/.profile-bak-$(date -I)
@@ -87,6 +88,8 @@ main() {
         shift
     done
     [[  $target_version =~ [0-9]+\.[0-9]+ ]] || die "Expected --target-version n.nn, e.g. \"3.8\" etc."
+    stub http_proxy "$http_proxy" "$https_proxy"
+    curl -I ${pyenv_url}  --max-time 4 &>/dev/null || die "Can't connect to ${pyenv_url}"
     do_install $target_version
 }
 

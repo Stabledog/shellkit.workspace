@@ -32,6 +32,7 @@ main() {
     type -P unzip || die "No 'unzip' on the PATH"
     local AWURL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
     mkdir -p /tmp
+    stub proxy "$http_proxy" "$https_proxy"
     command curl -I "$AWURL" --max-time 3 || die "Can't curl $AWURL -- Proxy issue?"
     command curl -o /tmp/awscliv2.zip "$AWURL" || die "Failed downloading $AWURL"
     cd /tmp

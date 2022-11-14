@@ -1,6 +1,6 @@
 # Dockerfile for shellkit.workspace/.devcontainer
 
-ARG https_proxy
+ARG http_proxy
 
 FROM localbuilt/shellkit-test-base:latest as vsudo-base
 
@@ -31,22 +31,24 @@ RUN pkgs="curl make unzip git rsync less"; \
         && apt-get install -y $pkgs;  \
     }
 
-RUN yum install -y openssh-clients docker \
+RUN yum install -y openssh-clients docker-compose \
     || { \
-        DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client docker; \
+        DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client docker-compose; \
     }
 
 
+ENV https_proxy=$http_proxy
+ENV http_proxy=$http_proxy
+
 COPY ./ /tmp/build/
-RUN /tmp/build/bin/py-install.sh --target-version 3.8
+RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/py-install.sh --target-version 3.8
 RUN bash -l -c 'python3.8 --version'
 
-ENV https_proxy=$https_proxy
 COPY ./bin/aws-install.sh /bin/
-RUN /bin/aws-install.sh /bin/
+RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/aws-install.sh /bin/
 
 COPY ./bin/gh-install.sh /bin/
-RUN /bin/gh-install.sh
+RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/gh-install.sh
 
 
 # There's a git credential helper we don't like:

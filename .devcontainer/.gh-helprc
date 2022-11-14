@@ -1,8 +1,10 @@
 # gh-helprc
-#   See https://github.com/stabledog/gh-help
+#   See https://github.com/sanekits/gh-help
 
 # TODO: set this to point to the hostname for your Github Enterprise server
 #  Then you can pass "-e" as the first argument to "gh-help.sh" so that the
 #  gh command uses the enterprise host instead of github.com for operations.
-export GH_HOST_ENTERPRISE=myenterprise.local
+export GH_HOST_ENTERPRISE=bbgithub.dev.bloomberg.com
+
+alias ghe='gh-help.sh -e'
 
