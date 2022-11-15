@@ -27,6 +27,9 @@ devcontainer_build_deps:= \
 	.devcontainer/docker-compose.yaml \
 
 
+environment.mk: ${HOME}/.shellkit-environment.mk
+	ln -sf ${HOME}/.shellkit-environment.mk environment.mk
+
 include environment.mk  # Symlink to environment-specific values
 
 DC:=docker-compose
@@ -50,8 +53,11 @@ print-environ: all_subgits environment.mk
 	@echo devcontainer_build_deps=${devcontainer_build_deps}
 	@echo all_targets=$$( $(MAKE) -s list-targets )
 
-.devcontainer/.env: environment.mk
-	echo ShellkitWorkspace=${ShellkitWorkspace} > .devcontainer/.env
+.env .devcontainer/.env: environment.mk
+	echo "# This is loaded by docker-compose automatically.  It's created by a target in the shellkit main Makefile" > .env
+	echo ShellkitWorkspace=${ShellkitWorkspace} >> .env
+	echo HostHome=${HOME} >> .env
+	( cd .devcontainer && ln -sf ../env )
 
 .PHONY: dcenv
 dcenv: .devcontainer/.env
@@ -106,8 +112,9 @@ ${absdir}/all-push-remotes git-show-push-remotes:
 			  ; \
 	done
 
+
 ${HOME}/.shellkit-environment.mk:
-	@cp templates/default-environment.mk ~/.shellkit-environment.mk
+	@cp default-environment.mk ~/.shellkit-environment.mk
 	@echo "NOTE:  you did not have a ~/.shellkit-environment.mk, so \
 I created one for you.  Now it's yours, and it's up to you to \
 put it in source control and customize it and take the blame \
@@ -118,8 +125,6 @@ for whatever's in it!"
 	@echo "Fail-exit on purpose to get the user's attention:"
 	exit 1
 
-environment.mk: ${HOME}/.shellkit-environment.mk
-	ln -sf ${HOME}/.shellkit-environment.mk environment.mk
 
 .PHONY: setup-workspace
 setup-workspace: environment.mk

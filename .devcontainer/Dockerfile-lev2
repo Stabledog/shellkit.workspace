@@ -1,0 +1,7 @@
+FROM localbuilt/shellkit-test-withtools:latest
+
+ARG HostHome
+
+# Because we do docker-in-docker, we want to know the
+# ultimate non-container HOME for mount propagation:
+ENV HostHome=${HostHome}

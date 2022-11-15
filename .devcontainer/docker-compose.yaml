@@ -1,16 +1,29 @@
 version: "3.4"
 services:
   shellkit-dev:
-    image: localbuilt/shellkit-test-withtools:latest
+    build:
+      dockerfile: Dockerfile-lev2
+      context: .
+
+      # Note:  HostHome != HOME:  this environment permits docker-in-docker, such that
+      # the HOST environment (not a container) needs to be distinctly identified when
+      # mapping volumes.
+      #
+      # To make this work, one should invoke docker-compose with:
+      #     HostHome=$HOME docker-compose up  # << When invoked from a non-container
+      #     docker-compose run shellkit-dev [command] # << When invoked from a container
+      args:
+        - HostHome=${HostHome}
     init: true
     command: sleep infinity
+
     volumes:
       - ${ShellkitWorkspace}/.devcontainer:/devcontainer:ro
-      - ${HOME}:/host_home:ro
+      - ${HostHome}:/host_home:ro
       - ${ShellkitWorkspace}:/workspace:cached
-      - ${HOME}/.aws:/home/vscode/.aws
-      - ${HOME}/.ssh:/home/vscode/.ssh:ro
-      - ${HOME}/.gitconfig:/home/vscode/.gitconfig:ro
+      - ${HostHome}/.aws:/home/vscode/.aws
+      - ${HostHome}/.ssh:/home/vscode/.ssh:ro
+      - ${HostHome}/.gitconfig:/home/vscode/.gitconfig:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - vdata:/vdata
     user: vscode

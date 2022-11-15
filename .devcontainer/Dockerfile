@@ -31,16 +31,19 @@ RUN pkgs="curl make unzip git rsync less"; \
         && apt-get install -y $pkgs;  \
     }
 
-RUN yum install -y openssh-clients docker-compose \
-    || { \
-        DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client docker-compose; \
-    }
-
+COPY ./ /tmp/build/
 
 ENV https_proxy=$http_proxy
 ENV http_proxy=$http_proxy
 
-COPY ./ /tmp/build/
+RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/docker-compose-install.sh
+
+RUN yum install -y openssh-clients  \
+    || { \
+        DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client ; \
+    }
+
+
 RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/py-install.sh --target-version 3.8
 RUN bash -l -c 'python3.8 --version'
 
