@@ -19,7 +19,7 @@ main() {
 [[ -z ${sourceMe} ]] && {
     echo "$scriptName starting" >&2
     cd /workspace && {
-        dest=$(readlink -f /host_home/.shellkit-environment.mk)
+        dest=$(readlink -f /host_home/shellkit-environment.mk)
         [[ -e $dest ]] && {
             ln -sf "$dest"  ./environment.mk
             echo "Updated $PWD/environment.mk OK" >&2

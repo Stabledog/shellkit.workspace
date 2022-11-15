@@ -53,11 +53,9 @@ print-environ: all_subgits environment.mk
 	@echo devcontainer_build_deps=${devcontainer_build_deps}
 	@echo all_targets=$$( $(MAKE) -s list-targets )
 
-.env .devcontainer/.env: environment.mk
-	echo "# This is loaded by docker-compose automatically.  It's created by a target in the shellkit main Makefile" > .env
-	echo ShellkitWorkspace=${ShellkitWorkspace} >> .env
-	echo HostHome=${HOME} >> .env
-	( cd .devcontainer && ln -sf ../env )
+.env .devcontainer/.env:
+	.devcontainer/bin/make-env.sh > .env
+	( cd .devcontainer && ln -sf ../.env ./ )
 
 .PHONY: dcenv
 dcenv: .devcontainer/.env
@@ -114,6 +112,10 @@ ${absdir}/all-push-remotes git-show-push-remotes:
 
 
 ${HOME}/shellkit-environment.mk:
+	[[ -f /host_home/shellkit-environment.mk ]] && {
+		ln -sf /host_home/shellkit-environment.mk
+		exit
+	} || :
 	@cp default-environment.mk ~/shellkit-environment.mk
 	@echo "NOTE:  you did not have a ~/shellkit-environment.mk, so \
 I created one for you.  Now it's yours, and it's up to you to \
@@ -127,7 +129,7 @@ for whatever's in it!"
 
 
 .PHONY: setup-workspace
-setup-workspace: environment.mk
+setup-workspace: environment.mk .env
 	@# setup_clone_urls is set in environment.mk:
 	@for item in ${setup_clone_urls};  do \
 		[ -d $$(basename $${item}) ] || { \
