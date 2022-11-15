@@ -27,8 +27,8 @@ devcontainer_build_deps:= \
 	.devcontainer/docker-compose.yaml \
 
 
-environment.mk: ${HOME}/.shellkit-environment.mk
-	ln -sf ${HOME}/.shellkit-environment.mk environment.mk
+environment.mk: ${HOME}/shellkit-environment.mk
+	ln -sf ${HOME}/shellkit-environment.mk environment.mk
 
 include environment.mk  # Symlink to environment-specific values
 
@@ -113,16 +113,16 @@ ${absdir}/all-push-remotes git-show-push-remotes:
 	done
 
 
-${HOME}/.shellkit-environment.mk:
-	@cp default-environment.mk ~/.shellkit-environment.mk
-	@echo "NOTE:  you did not have a ~/.shellkit-environment.mk, so \
+${HOME}/shellkit-environment.mk:
+	@cp default-environment.mk ~/shellkit-environment.mk
+	@echo "NOTE:  you did not have a ~/shellkit-environment.mk, so \
 I created one for you.  Now it's yours, and it's up to you to \
 put it in source control and customize it and take the blame \
 for whatever's in it!"
 	@echo "  (You should run make again after you've done that)"
-	@ln -sf ${HOME}/.shellkit-environment.mk ./environment.mk
+	@ln -sf ${HOME}/shellkit-environment.mk ./environment.mk
 	@echo
-	@echo "Fail-exit on purpose to get the user's attention:"
+	@echo "Fail-exit on purpose to get the user's attention:  this is not a real error"
 	exit 1
 
 
