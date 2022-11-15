@@ -36,7 +36,7 @@ COPY ./ /tmp/build/
 ENV https_proxy=$http_proxy
 ENV http_proxy=$http_proxy
 
-RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/docker-compose-install.sh
+RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/docker-install.sh
 
 RUN yum install -y openssh-clients  \
     || { \
