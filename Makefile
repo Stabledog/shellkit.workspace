@@ -112,10 +112,11 @@ ${absdir}/all-push-remotes git-show-push-remotes:
 
 
 ${HOME}/shellkit-environment.mk:
-	[[ -f /host_home/shellkit-environment.mk ]] && {
-		ln -sf /host_home/shellkit-environment.mk
-		exit
-	} || :
+	[[ -f /host_home/shellkit-environment.mk ]] && { \
+		ln -sf /host_home/shellkit-environment.mk environment.mk; \
+		echo "Symlinked environment.mk to /host_home/shellkit-environment.mk"; \
+		exit; \
+	} || : ; 
 	@cp default-environment.mk ~/shellkit-environment.mk
 	@echo "NOTE:  you did not have a ~/shellkit-environment.mk, so \
 I created one for you.  Now it's yours, and it's up to you to \

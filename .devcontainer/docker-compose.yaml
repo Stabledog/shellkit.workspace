@@ -15,7 +15,11 @@ services:
       args:
         - HostHome=${HostHome}
     init: true
-    command: sleep infinity
+    command: ./run_dockerized.sh
+    working_dir: /workspace
+    environment:
+      - ShellkitWorkspace=${ShellkitWorkspace}
+      - HostHome=${HostHome}
 
     volumes:
       - ${ShellkitWorkspace}/.devcontainer:/devcontainer:ro
