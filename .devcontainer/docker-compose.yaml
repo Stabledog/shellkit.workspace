@@ -15,7 +15,7 @@ services:
       args:
         - HostHome=${HostHome}
     init: true
-    command: ./run_dockerized.sh
+    command: .devcontainer/bin/run_dockerized.sh
     working_dir: /workspace
     environment:
       - ShellkitWorkspace=${ShellkitWorkspace}

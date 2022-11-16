@@ -33,16 +33,26 @@ main() {
     touch /.touchtest && rm /.touchtest || die "Can't create /.touchtest"
 
     #  See also:  https://askubuntu.com/a/1388299/73165
-    curl -I -L --max-time 4 https://download.docker.com/linux/ubuntu/gpg || die "Fail connecting to docker.com for gpg key"
+    docker_cli_url="https://download.docker.com/linux/ubuntu/dists/focal/pool/stable/amd64/docker-ce-cli_20.10.21~3-0~ubuntu-focal_amd64.deb"
+    curl -I -L --max-time 4 "$docker_cli_url" \
+        || die "Can't detect existence of $docker_cli_url"
+    curl -L "$docker_cli_url" -o /tmp/docker-ce-cli.deb \
+        || die "Can't download $docker_cli_url"
+    dpkg -i /tmp/docker-ce-cli.deb \
+        || die "Can't install /tmp/docker-ce-cli.deb"
 
-    mkdir -p /etc/apt/keyrings
-    rm -f /etc/apt/keyrings/docker.gpg &>/dev/null
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
-        | tee /etc/apt/sources.list.d/docker.list > /dev/null
-    [[ $? -eq 0 ]] || die "Fail creating docker.list"
+    docker info
 
-    apt-get update && apt-get install -y docker-ce-cli || die "Failed installing docker-ce-cli"
+    # curl -I -L --max-time 4 https://download.docker.com/linux/ubuntu/gpg || die "Fail connecting to docker.com for gpg key"
+
+    # mkdir -p /etc/apt/keyrings
+    # rm -f /etc/apt/keyrings/docker.gpg &>/dev/null
+    # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    # echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+    #     | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    # [[ $? -eq 0 ]] || die "Fail creating docker.list"
+
+    # apt-get update && apt-get install -y docker-ce-cli || die "Failed installing docker-ce-cli"
 
     cd /tmp \
         && curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose \
