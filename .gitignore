@@ -7,6 +7,7 @@ bcs-test
 cdpp
 docktools
 .env
+.env-tmp
 environment.mk
 gh-help
 gitsmart

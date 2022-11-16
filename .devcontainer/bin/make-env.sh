@@ -30,6 +30,7 @@ getHostHome() {
     # By prioritizing docker, and falling back to host, we get the right value reliably
     local path
     local spec
+    set -x
     for path in /host_home/shellkit-environment.mk $HOME/shellkit-environment.mk; do
         [[ -f $path ]] && {
             spec="$(grep HostHome $path)"
@@ -45,14 +46,19 @@ getHostHome() {
 
 emitEnvText() {
     cat <<-EOF
-# This is loaded by docker-compose automatically.  It's created make-env.sh
+# This is loaded by docker-compose automatically.  It's created
+#  by .devcontainer/bin/make-env.sh
 ShellkitWorkspace="$(dirname $(dirname $scriptDir))"
 HostHome="$(getHostHome)"
 EOF
 }
 
 main() {
-    emitEnvText "$@"
+    local result="$(emitEnvText $@)"
+    eval "$result" || die "Failed evaluating result"
+    [[ -n $HostHome ]] || die "Empty HostHome"
+    [[ -n $ShellkitWorkspace ]] || die "Empty ShellkitWorkspace"
+    echo "$result"
 }
 
 [[ -z ${sourceMe} ]] && {

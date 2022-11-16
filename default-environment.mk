@@ -37,3 +37,7 @@ setup_clone_urls:= \
 	https://github.com/sanekits/vscode-tools \
 
 ShellkitWorkspace=${absdir}
+# On a new environment, you must set HostHome in your custom ~/shellkit-environment.mk,
+# e.g. HostHome=/home/myusername.  This gets propagated through docker-in-docker invocations
+# so that inner environments can use it to map volumes into containers.
+HostHome=/default/host/home/undefined
