@@ -5,7 +5,7 @@
 - Clone shellkit.workspace into WSL, e.g. `~/projects/shellkit.workspace`
 - If you have a custom `shellkit-environment.mk`, symlink it to `$HOME/shellkit-environment.mk`
 - Run `make setup-workspace`
-- Run `cd .devcontainer && make -f taskrc.mk shellkit-test-withtools` to build the development environment image
+- See [README-docker.md](.devcontainer/README-docker.md) for devcontainer guidance
 - Open VSCode and do `Reopen in container`
 
 ## Maintenance tasks
@@ -13,6 +13,9 @@
 ### Git sync
 - `make git-status` in the root to see all changes
 - `make git-pull && make git-push` to sync
+
+### Devcontainer build/maintenance
+- See [README-docker.md](.devcontainer/README-docker.md)
 
 ## Key components
 
