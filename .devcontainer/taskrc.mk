@@ -59,9 +59,19 @@ shellkit-test-vsudo: .flag/shellkit-test-vsudo
 .PHONY: shellkit-test-withtools
 shellkit-test-withtools: .flag/shellkit-test-withtools
 
+.PHONY: check-image-status
+check-image-status:
+	printf "Docker image cache: \n" && \
+		docker image ls | grep -E 'localbuilt/shellkit-test-withtools' && printf " --> OK\n";
+
+	printf "Running trivial command in container:" && \
+		docker run --rm localbuilt/shellkit-test-withtools true && printf " OK\n" ;
+
+	echo "image-status OK"
+
 .PHONY: dc-up
 dc-up .flag/dc-up: .flag/shellkit-test-base
-	docker-compose up
+	docker-compose up -d
 	touch .flag/dc-up
 
 .PHONY: dc-down

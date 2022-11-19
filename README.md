@@ -37,3 +37,10 @@
 
 ### `$HostHome`:
 - Refers to the host environment's HOME tree, which provides the ultimate anchor for volume mounting of shared stuff.  In a docker-in-docker env, this would still say /home/your-real-username.
+
+### `<Kit>/shellkit-ref`:
+- Per-kit optional config file
+- Specifies the shellkit branch or ref to check out for the embedded `./shellkit/` node of the kit tree
+- This permits kits to "pin" to specific (e.g. older or newer) variants of shellkit shared code.
+- Supported in primary `make` workflow
+- If not present, implies `main` branch
