@@ -4,6 +4,8 @@ Component:=$(undefined you must supply Component setting on the command line to 
 SHELL:=/bin/bash
 
 Baseimg:=$(shell bin/get_metabase.sh $(Component) )
+# You can override Runas if you want to be root in the container:
+Runas:=-u $(shell id -u)
 
 .PHONY: sanity-check
 sanity-check:
@@ -24,6 +26,6 @@ image: sanity-check
 .PHONY: run
 run: sanity-check
 	@# e.g. make -f shellkit-component.mk Component=shellkit-pytest Volumes="-v xxx:/yyy" Command="python3.8 -m pytest /yyy"
-	docker run $(Volumes) --rm -it $(Component):latest $(Command)
+	docker run $(Runas) $(Volumes) --rm -it $(Component):latest bash -c "$(Command)"
 
 
