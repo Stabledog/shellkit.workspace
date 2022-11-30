@@ -6,8 +6,15 @@ absdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SHELL := /bin/bash
 REMAKE := $(MAKE) -C $(absdir) -s -f $(lastword $(MAKEFILE_LIST))
 
+# TODO: the whole idea of a "test base" is deprecated, we need a more composable
+# environment:
+#   - shellkit-pytest:  Python 3.8 +pytest, for python-dependent kits
+#   - shellkit-aws: AWS utility environment
+#   - shellkit-gh: Github gh cli environment
+#   - shellkit-compat: Kit compatibility validation
+
 base_imgtag := shellkit-test-base:latest
-metabase_bb := $(shell bash bin/get_metabase.sh 2>/dev/null)
+#metabase_bb := $(shell bash bin/get_metabase.sh 2>/dev/null)
 
 .PHONY: help
 help:
@@ -43,6 +50,7 @@ shellkit-test-base: .flag/shellkit-test-base Dockerfile
 		-t localbuilt/shellkit-test-vsudo:latest . \
 	&& echo "localbuilt/shellkit-test-vsudo:latest image built OK" >&2
 	touch .flag/shellkit-test-vsudo
+
 .PHONY: shellkit-test-vsudo
 shellkit-test-vsudo: .flag/shellkit-test-vsudo
 
@@ -81,6 +89,7 @@ dc-down:
 
 .PHONY: dc-shell
 dc-shell: .flag/dc-up
+	[ -n "$(container_name)" ] || { echo "ERROR: set container_name to invoke dc-shell target" >&2; exit 1; }
 	docker-compose exec -w /workspace -u vscode $(container_name) bash
 
 .PHONY: clean

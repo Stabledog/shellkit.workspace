@@ -2,8 +2,10 @@
 
 Component:=$(undefined you must supply Component setting on the command line to make)
 SHELL:=/bin/bash
+# See https://stackoverflow.com/a/73509979/237059
+absdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-Baseimg:=$(shell bin/get_metabase.sh $(Component) )
+Baseimg:=$(shell $(absdir)/bin/get_metabase.sh $(Component) )
 # You can override Runas if you want to be root in the container:
 Runas:=-u $(shell id -u)
 
@@ -19,13 +21,20 @@ image: sanity-check
 	sed \
 		-e "s|<component-name>|$(Component)|" \
 		-e "s|<base-image-name>|$(Baseimg)|" \
-		$(Component).dockerfile \
+		$(absdir)/$(Component).dockerfile \
 		|  \
 		BUILDKIT_PROGRESS=plain docker build -t $(Component) -
 
 .PHONY: run
 run: sanity-check
 	@# e.g. make -f shellkit-component.mk Component=shellkit-pytest Volumes="-v xxx:/yyy" Command="python3.8 -m pytest /yyy"
-	docker run $(Runas) $(Volumes) --rm -it $(Component):latest bash -c "$(Command)"
+	docker run \
+		$(Runas) \
+		$(Environment) \
+		$(Volumes) \
+		-v $(HOME):/host_home:ro \
+		--rm -it \
+		$(Component):latest \
+		bash -c "$(Command)"
 
 
