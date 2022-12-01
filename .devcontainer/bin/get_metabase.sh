@@ -47,7 +47,7 @@ components() {
 shellkit-pytest python:3.8-bullseye $Artprod/dpkg-python-development-base:3.8 # For python-based testing
 shellkit-aws unk unk # For publishing to AWS S3
 shellkit-gh unk unk # For github API
-shellkit-compat unk unk # For shellkit compatibility testing
+shellkit-conformity ubuntu:focal $Artprod/rhel7-dpkg-scratch-builder:latest # For shellkit conformity testing
 EOF
 }
 

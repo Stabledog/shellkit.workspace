@@ -21,6 +21,8 @@ image: sanity-check
 	sed \
 		-e "s|<component-name>|$(Component)|" \
 		-e "s|<base-image-name>|$(Baseimg)|" \
+		-e "s|<uuid>|$$(id -u)|" \
+		-e "s|<username>|vscode|" \
 		$(absdir)/$(Component).dockerfile \
 		|  \
 		BUILDKIT_PROGRESS=plain docker build -t $(Component) -
