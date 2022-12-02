@@ -11,6 +11,7 @@ type -t localhist_set >/dev/null && {
 
 tmk() {
     #Help: help -- list targets; tmk -e -- edit taskrc.mk
+    export container_name=shellkit-dev
     case $1 in
         -e|--edit)
             shift

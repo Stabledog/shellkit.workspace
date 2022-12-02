@@ -13,7 +13,8 @@ RUN set -x; which yum && { \
         echo "No yum, trying apt-get:"; \
         apt-get update -y \
         && apt-get install -y sudo locales \
-        && locale-gen "en_US.UTF-8" ; \
+        && locale-gen "en_US.UTF-8"  \
+        && rm -rf /var/lib/apt/lists/* ; \
     }
 
 COPY ./bin/user-build.sh /bin/
@@ -29,7 +30,8 @@ FROM vsudo-base as withtools
 RUN pkgs="curl make unzip git rsync less"; \
     which $pkgs || { \
         apt-get update \
-        && apt-get install -y $pkgs;  \
+        && apt-get install -y $pkgs  \
+        && rm -rf /var/lib/apt/lists/* ; \
     }
 
 COPY ./ /tmp/build/
@@ -41,12 +43,14 @@ RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/docker-install
 
 RUN yum install -y openssh-clients  \
     || { \
-        DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client ; \
+        DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-client \
+        && rm -rf /var/lib/apt/lists/* ; \
     }
 
 
-RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/py-install.sh --target-version 3.8
-RUN bash -l -c 'python3.8 --version'
+#RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/py-install.sh --target-version 3.8
+RUN bash -l -c 'python3.8 --version' && \
+    python3.8 -m pip install -y pytest
 
 COPY ./bin/aws-install.sh /bin/
 RUN https_proxy=$http_proxy http_proxy=$http_proxy /tmp/build/bin/aws-install.sh /bin/

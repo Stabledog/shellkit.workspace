@@ -169,6 +169,9 @@ devcontainer-vscode-user: shellkit-test-base-exists dcenv
 .PHONY: devcontainer-build
 devcontainer-build: .devcontainer/build-semaphore
 
+.PHONY: devcontainer-history
+devcontainer-history:
+	docker history --no-trunc shellkit-test-withtools | tr -s ' '
 
 .PHONY: devcontainer-run
 devcontainer-run: .devcontainer/build-semaphore dcenv
