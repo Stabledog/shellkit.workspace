@@ -1,6 +1,7 @@
 # shellkit-component.mk
 
 Component:=$(undefined you must supply Component setting on the command line to make)
+Volumes:= -v ${PWD}:/workspace
 SHELL:=/bin/bash
 # See https://stackoverflow.com/a/73509979/237059
 absdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -35,7 +36,7 @@ run: sanity-check
 		$(Environment) \
 		$(Volumes) \
 		-v $(HOME):/host_home:ro \
-		--rm -it \
+		--init --rm -it \
 		$(Component):latest \
 		bash -c "$(Command)"
 
