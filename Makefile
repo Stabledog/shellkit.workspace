@@ -1,3 +1,4 @@
+#!/bin/make -f
 # Makefile for shellkit.workspace
 
 
