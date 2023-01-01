@@ -94,6 +94,15 @@ git-push:
 	  do ( echo '$$\n' "[$${item}]" ; cd $${item} && git push ; git status; echo "[End of: $$item]")  ;  done
 	git push
 
+.PHONY: git-issues
+git-issues:
+	for item in $(all_subgits); \
+		do ( cd $$item && echo ">> $$item:" && { gh issue list || ghe issue list; } | sed 's/^/   /' );\
+	done \
+
+
+
+
 .PHONY: git-sync
 git-sync: git-pull git-push
 
