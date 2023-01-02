@@ -96,9 +96,13 @@ git-push:
 
 .PHONY: git-issues
 git-issues:
+	@outfile=/tmp/shellkit-open-issues.log; \
+	echo > $$outfile; \
 	for item in $(all_subgits); \
-		do ( cd $$item && echo ">> $$item:" && { gh issue list || ghe issue list; } | sed 's/^/   /' );\
-	done \
+		do ( cd $$item && echo ">> $$item:" && { gh issue list || ghe issue list; } | sed 's/^/   /' ) | tee -a $$outfile ;\
+	done; \
+	echo "Report saved as $$outfile"
+
 
 
 
