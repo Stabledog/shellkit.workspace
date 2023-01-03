@@ -258,5 +258,38 @@ docker-install-all-kits:
 		true; \
 	done;
 
+RepublishKits :=
+RepublishComment :=
+
+.PHONY: republish-kits
+republish-kits:
+	@# Does a rebuild/re-publish for a set of kits defined in $(RepublishKits)
+	@# Commits to github with required $(RepublishComment)
+	@# e.g.  make republish-kits RepublishKits="localhist ps1-foo"
+	@#    Results are recorded in /tmp/republish-kits.log
+	[[ -n "$(RepublishKits)" ]] || exit 1;
+	[[ -n "$(RepublishComment)" ]] || exit 2;
+	@logf=/tmp/republish-kits.log; \
+	echo "$$(date -Iminutes) Republish session start for kits <$(RepublishKits)> [$(RepublishComment)]" | tee -a $$logf; \
+	for kit in $(RepublishKits); do \
+		( \
+			cd $$kit || exit 1; \
+			echo "$$(date -Iminutes) $$kit is starting from v$$(cat version)" | tee -a $$logf ; \
+			( cd shellkit && git pull ); \
+			make verbump apply-version build conformity-check || exit 1; \
+			git add . && git commit -m "$(RepublishComment)" && git push || exit 1; \
+			make publish || exit 1; \
+			echo "$$(date -Iminutes) $$kit re-published as v$$(cat version)" | tee -a $$logf ; \
+		) || { \
+			echo "ERROR occurred.  Review $$logf for progress state." >&2;  \
+			exit 1 ;\
+		}; \
+	done ; \
+	echo "$$(date -Iminutes) Republish session END for kits <$(RepublishKits)> [$(RepublishComment)]" | tee -a $$logf; \
+	echo "Review $$logf for status." \
+
+
+
+
 
 
