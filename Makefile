@@ -279,7 +279,7 @@ republish-kits:
 			make verbump apply-version build conformity-check || exit 1; \
 			git add . && git commit -m "$(RepublishComment)" && git push || exit 1; \
 			make publish || exit 1; \
-			echo "$$(date -Iminutes) $$kit re-published as v$$(cat version)" | tee -a $$logf ; \
+			echo "$$(date -Iminutes) $$kit re-published as v$$(cat version) [$(RepublishComment)]" | tee -a $$logf ; \
 		) || { \
 			echo "ERROR occurred.  Review $$logf for progress state." >&2;  \
 			exit 1 ;\
