@@ -3,7 +3,6 @@
 Component:=$(undefined you must supply Component setting on the command line to make)
 Volumes:= -v ${PWD}:/workspace
 SHELL:=/bin/bash
-# See https://stackoverflow.com/a/73509979/237059
 absdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 Baseimg:=$(shell $(absdir)/bin/get_metabase.sh $(Component) )
