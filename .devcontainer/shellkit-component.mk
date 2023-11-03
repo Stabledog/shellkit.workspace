@@ -1,4 +1,9 @@
 # shellkit-component.mk
+SHELL=/bin/bash
+.ONESHELL:
+.SUFFIXES:
+MAKEFLAGS += --no-builtin-rules --no-print-directory
+
 
 Component:=$(undefined you must supply Component setting on the command line to make)
 Volumes:= -v ${PWD}:/workspace
@@ -11,9 +16,10 @@ Runas:=-u $(shell id -u)
 
 .PHONY: sanity-check
 sanity-check:
-	@[[ -n "$(Component)" ]] || { echo "Error: Component not defined" ; exit 1; }
-	@[[ -n "$(Baseimg)" ]] || { echo "Error Baseimg not defined for $(Component)"; exit 1; }
-	@true
+	@set -ue
+	[[ -n "$(Component)" ]] || { echo "Error: Component not defined" ; exit 1; }
+	[[ -n "$(Baseimg)" ]] || { echo "Error Baseimg not defined for $(Component)"; exit 1; }
+	true
 
 
 .PHONY: image
